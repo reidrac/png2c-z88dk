@@ -1,7 +1,7 @@
 png2c.py
 ========
 
-This is a simple tool to convert a 24 or 23 bit PNG image to a
+This is a simple tool to convert a 24 or 32 bit PNG image to a
 include file suitable to be used with Z88DK and the ZX Spectrum
 version of the SP1 sprite library that is distributed with it.
 

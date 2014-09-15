@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 """
-__version__ = "1.1"
+__version__ = "1.2"
 
 from argparse import ArgumentParser
 from PIL import Image
@@ -125,10 +125,10 @@ def main():
                 attrib[byte_i] = attr
                 tiles[byte_i] = len(tiles)
                 if out:
-                    out += ", // %d, %d\n" % (prev)
+                    out += ", // y:%d, x:%d (%i)\n" % (prev)
                     prev = None
                 out += ', '.join(["0x%02x" % b for b in byte])
-                prev = (x / 8, y / 8)
+                prev = (y / 8, x / 8, tiles[byte_i] + args.base)
 
             if cur_attr != attrib[byte_i]:
                 ink, paper = attrib[byte_i]
@@ -143,7 +143,7 @@ def main():
             print_str.append(13)
 
     if prev:
-        out += "  // %d, %d" % (prev)
+        out += ", // y:%d, x:%d (%i)\n" % (prev)
 
     print_str.append(0)
 

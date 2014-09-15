@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 """
-__version__ = "1.0"
+__version__ = "1.1"
 
 from argparse import ArgumentParser
 from PIL import Image
@@ -63,10 +63,15 @@ def main():
                         help="variable name (default: tiles)")
     parser.add_argument("--no-print-string", dest="no_pstring", action="store_true",
                         help="don't include the print string")
+    parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
+                        help="limit the print string to n chars (default: no limit)")
 
     parser.add_argument("image", help="image to convert")
 
     args = parser.parse_args()
+
+    if args.limit < 0:
+        args.limit = 0
 
     try:
         image = Image.open(args.image)
@@ -93,6 +98,7 @@ def main():
     attrib = {}
     print_str = []
     cur_attr = None
+    count = 0
     for y in range(0, h, 8):
         for x in range(0, w, 8):
             byte = []
@@ -119,16 +125,25 @@ def main():
                 attrib[byte_i] = attr
                 tiles[byte_i] = len(tiles)
                 if out:
-                    out += ",\n"
-                out += ', '.join(["%d" % b for b in byte])
+                    out += ", // %d, %d\n" % (prev)
+                    prev = None
+                out += ', '.join(["0x%02x" % b for b in byte])
+                prev = (x / 8, y / 8)
 
             if cur_attr != attrib[byte_i]:
                 ink, paper = attrib[byte_i]
-                print_str.extend([20, C2I[ink] | C2P[paper]])
+                if not args.limit or count < args.limit:
+                    print_str.extend([20, C2I[ink] | C2P[paper]])
                 cur_attr = attrib[byte_i]
 
-            print_str.append(tiles[byte_i] + args.base)
-        print_str.append(13)
+            if not args.limit or count < args.limit:
+                print_str.append(tiles[byte_i] + args.base)
+            count += 1
+        if not args.limit or count < args.limit:
+            print_str.append(13)
+
+    if prev:
+        out += "  // %d, %d" % (prev)
 
     print_str.append(0)
 
@@ -136,7 +151,7 @@ def main():
     for part in range(0, len(print_str), 8):
         if print_out:
             print_out += ",\n"
-        print_out += ', '.join(["%d" % c for c in print_str[part:part + 8]])
+        print_out += ', '.join(["0x%02x" % c for c in print_str[part:part + 8]])
 
     # header
     print("""
@@ -150,7 +165,9 @@ def main():
 """ % (__version__, args.image, w, h, w / 8, h / 8, len(tiles), args.base,))
 
     if not args.no_pstring:
-        print("uchar p%s[] = {\n%s\n};" % (args.id, print_out,))
+        if args.limit:
+            print("/* limited to %d chars */" % args.limit)
+        print("uchar p%s[] = {\n%s\n};\n" % (args.id, print_out,))
 
     print("""\
 #define %s_BASE %d

@@ -172,7 +172,7 @@ def main():
     print("""\
 #define %s_BASE %d
 #define %s_LEN %d
-uchar %s[] = {\n%s\n};
+uchar %s[] = {\n%s};
  """ % (args.id.upper(),args.base, args.id.upper(), len(tiles),
         args.id, out,))
 

@@ -48,7 +48,7 @@ ATTR_P = ( 0x00, 0x08, 0x08 | 0x40, 0x10, 0x10 | 0x40,
 C2I = dict(zip(COLORS, ATTR_I))
 C2P = dict(zip(COLORS, ATTR_P))
 
-BASE = 150
+BASE = 128
 
 def main():
 

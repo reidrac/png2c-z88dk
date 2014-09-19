@@ -11,6 +11,8 @@ version of the SP1 sprite library that is distributed with it.
  * some useful defines to call `sp1_TileEntry` (eg, TILES_BASE)
  * an optional array to use with `sp1_PrintString` (eg, ptiles)
 
+See `-h` flag for a list of options.
+
 For example:
 ```
 $ py2png.py image.png > image.h
@@ -27,7 +29,7 @@ used with:
         sp1_TileEntry(TILES_BASE + i, pt);
 ```
 
-`TILES_BASE` starts in 150 by default (can be changed with `-b`
+`TILES_BASE` starts in 128 by default (can be changed with `-b`
 flag).
 
 Then the print string can be used:

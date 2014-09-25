@@ -35,7 +35,7 @@ flag).
 Then the print string can be used:
 
 ```C
-	// print the string staring in 0,0
+	// print the string starting in 0,0
     sp1_SetPrintPos(&ps0, 0, 0);
     sp1_PrintString(&ps0, ptiles);
 ```

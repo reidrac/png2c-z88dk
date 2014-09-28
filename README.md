@@ -15,7 +15,7 @@ See `-h` flag for a list of options.
 
 For example:
 ```
-$ py2png.py image.png > image.h
+$ png2c.py image.png > image.h
 ```
 
 This will use the default variable name "tiles", so it can be

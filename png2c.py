@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 """
-__version__ = "1.2"
+__version__ = "1.2.1"
 
 from argparse import ArgumentParser
 from PIL import Image
@@ -81,7 +81,7 @@ def main():
     (w, h) = image.size
 
     if w % 8 or h % 8:
-        parser.error("%s size is not multiple of 8")
+        parser.error("%r size is not multiple of 8" % args.image)
 
     if not isinstance(image.getpixel((0, 0)), tuple):
         parse.error("only RGB(A) images are supported")

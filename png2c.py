@@ -147,6 +147,29 @@ def main():
 
     print_str.append(0)
 
+    # "compress" the print string (sort of RLE)
+    # this could be improved
+    p = 0
+    new_print_str = []
+    while p < len(print_str):
+        c = print_str[p]
+        if c < 32:
+            new_print_str.append(c)
+        else:
+            repeat = 0
+            while repeat + p + 1 < len(print_str) and repeat < 255:
+                if print_str[repeat + p + 1] != c:
+                    break
+                repeat += 1
+            if repeat > 4:
+                new_print_str.extend([14, repeat + 1, c, 15])
+                p += repeat
+            else:
+                new_print_str.append(c)
+        p += 1
+
+    print_str = new_print_str
+
     print_out = ""
     for part in range(0, len(print_str), 8):
         if print_out:

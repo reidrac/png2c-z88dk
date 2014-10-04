@@ -106,7 +106,9 @@ def main():
             for j in range(8):
                 row = 0
                 for i in range(8):
-                    if data[x + i + (j + y) * w] != COLORS[0]:
+                    if not attr:
+                        attr.append(data[x + i + (j + y) * w])
+                    if data[x + i + (j + y) * w] != attr[0]:
                         row |= 1 << (7 - i)
                     if data[x + i + (j + y) * w] not in attr:
                         attr.append(data[x + i + (j + y) * w])
@@ -116,9 +118,6 @@ def main():
                 parser.error("more than 2 colors in an attribute block in (%d, %d)" % (x, y))
             elif len(attr) < 2:
                 attr.append(COLORS[0])
-
-            if attr[0] == COLORS[0] and attr[1] != COLORS[0]:
-                attr[0], attr[1] = attr[1], attr[0]
 
             byte_i = tuple(byte + attr)
             if byte_i not in tiles:
@@ -131,7 +130,7 @@ def main():
                 prev = (y / 8, x / 8, tiles[byte_i] + args.base)
 
             if cur_attr != attrib[byte_i]:
-                ink, paper = attrib[byte_i]
+                paper, ink = attrib[byte_i]
                 if not args.limit or count < args.limit:
                     print_str.extend([20, C2I[ink] | C2P[paper]])
                 cur_attr = attrib[byte_i]

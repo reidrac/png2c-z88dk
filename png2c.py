@@ -155,6 +155,10 @@ def main():
         c = print_str[p]
         if c < 32:
             new_print_str.append(c)
+            # has a parameter
+            if c == 20:
+                p += 1
+                new_print_str.append(print_str[p])
         else:
             repeat = 0
             while repeat + p + 1 < len(print_str) and repeat < 255:

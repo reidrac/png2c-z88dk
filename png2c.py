@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 """
-__version__ = "1.2.1"
+__version__ = "1.4"
 
 from argparse import ArgumentParser
 from PIL import Image
@@ -36,6 +36,12 @@ COLORS = ( (0, 0, 0),
            (205, 205, 0), (255, 255, 0),
            (205, 205, 205), (255, 255, 255),
            )
+
+COLOR_NAMES = ( "black", "blue", "bright-blue",
+                "red", "bright-red", "magenta", "bright-magenta",
+                "green", "bright-green", "cyan", "bright-cyan",
+                "yellow", "bright-yellow", "white", "bright-white",)
+
 
 ATTR_I = ( 0x00, 0x01, 0x01 | 0x40, 0x02, 0x02 | 0x40,
            0x03, 0x03 | 0x40, 0x04, 0x04 | 0x40, 0x05, 0x05 | 0x40,
@@ -65,10 +71,28 @@ def main():
                         help="don't include the print string")
     parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                         help="limit the print string to n chars (default: no limit)")
+    parser.add_argument("--preferred-bg", dest="color", type=str, default=None,
+                        help="preferred background color (eg, black)")
+    parser.add_argument("--list-colors", dest="list_colors", action="store_true",
+                        help="list color names (for --preferred-bg option)")
 
-    parser.add_argument("image", help="image to convert")
+    parser.add_argument("image", help="image to convert", nargs="?")
 
     args = parser.parse_args()
+
+    if args.list_colors:
+        print("Color list: %s" % ', '.join(COLOR_NAMES))
+        return
+
+    if not args.image:
+        parser.error("required parameter: image")
+
+    bg_color = None
+    if args.color:
+        if args.color.lower() not in COLOR_NAMES:
+            parser.error("invalid color name %r" % args.color)
+        else:
+            bg_color = COLORS[COLOR_NAMES.index(args.color.lower())]
 
     if args.limit < 0:
         args.limit = 0
@@ -118,6 +142,10 @@ def main():
                 parser.error("more than 2 colors in an attribute block in (%d, %d)" % (x, y))
             elif len(attr) < 2:
                 attr.append(COLORS[0])
+
+            if bg_color and attr[0] != bg_color and attr[1] == bg_color:
+                attr[0], attr[1] = attr[1], attr[0]
+                byte = [~b & 0xff for b in byte]
 
             byte_i = tuple(byte + attr)
             if byte_i not in tiles:

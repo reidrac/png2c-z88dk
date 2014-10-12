@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 """
-__version__ = "1.4"
+__version__ = "1.4.1"
 
 from argparse import ArgumentParser
 from PIL import Image
@@ -119,7 +119,6 @@ def main():
 
     out = ""
     tiles = {}
-    attrib = {}
     print_str = []
     cur_attr = None
     count = 0
@@ -147,9 +146,8 @@ def main():
                 attr[0], attr[1] = attr[1], attr[0]
                 byte = [~b & 0xff for b in byte]
 
-            byte_i = tuple(byte + attr)
+            byte_i = tuple(byte)
             if byte_i not in tiles:
-                attrib[byte_i] = attr
                 tiles[byte_i] = len(tiles)
                 if out:
                     out += ", // y:%d, x:%d (%i)\n" % (prev)
@@ -157,11 +155,11 @@ def main():
                 out += ', '.join(["0x%02x" % b for b in byte])
                 prev = (y / 8, x / 8, tiles[byte_i] + args.base)
 
-            if cur_attr != attrib[byte_i]:
-                paper, ink = attrib[byte_i]
+            if cur_attr != attr:
+                paper, ink = attr
                 if not args.limit or count < args.limit:
                     print_str.extend([20, C2I[ink] | C2P[paper]])
-                cur_attr = attrib[byte_i]
+                cur_attr = attr
 
             if not args.limit or count < args.limit:
                 print_str.append(tiles[byte_i] + args.base)

@@ -69,6 +69,8 @@ def main():
                         help="variable name (default: tiles)")
     parser.add_argument("--no-print-string", dest="no_pstring", action="store_true",
                         help="don't include the print string")
+    parser.add_argument("--matrix", dest="matrix", action="store_true",
+                        help="output a tile/attribute matrix")
     parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                         help="limit the print string to n chars (default: no limit)")
     parser.add_argument("--preferred-bg", dest="color", type=str, default=None,
@@ -120,6 +122,7 @@ def main():
     out = ""
     tiles = {}
     print_str = []
+    matrix = []
     cur_attr = None
     count = 0
     for y in range(0, h, 8):
@@ -163,6 +166,9 @@ def main():
 
             if not args.limit or count < args.limit:
                 print_str.append(tiles[byte_i] + args.base)
+                paper, ink = attr
+                matrix.append((C2I[ink] | C2P[paper], tiles[byte_i] + args.base))
+
             count += 1
         if not args.limit or count < args.limit:
             print_str.append(13)
@@ -205,6 +211,12 @@ def main():
             print_out += ",\n"
         print_out += ', '.join(["0x%02x" % c for c in print_str[part:part + 8]])
 
+    matrix_out = ""
+    for part in range(0, len(matrix), 8):
+        if matrix_out:
+            matrix_out += ",\n"
+        matrix_out += ', '.join(["{ 0x%02x, 0x%02x }" % (a, t) for a, t in matrix[part: part + 8]])
+
     # header
     print("""
 /* png2c.py %s
@@ -220,6 +232,11 @@ def main():
         if args.limit:
             print("/* limited to %d chars */" % args.limit)
         print("uchar p%s[] = {\n%s\n};\n" % (args.id, print_out,))
+
+    if args.matrix:
+        if args.limit:
+            print("/* limited to %d chars */" % args.limit)
+        print("struct sp1_tp %s_tp[%s] = {\n%s\n};\n" % (args.id, len(matrix), matrix_out,))
 
     print("""\
 #define %s_BASE %d

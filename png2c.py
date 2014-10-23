@@ -167,7 +167,7 @@ def main():
             if not args.limit or count < args.limit:
                 print_str.append(tiles[byte_i] + args.base)
                 paper, ink = attr
-                matrix.append((C2I[ink] | C2P[paper], tiles[byte_i] + args.base))
+                matrix.extend([C2I[ink] | C2P[paper], tiles[byte_i] + args.base])
 
             count += 1
         if not args.limit or count < args.limit:
@@ -215,7 +215,7 @@ def main():
     for part in range(0, len(matrix), 8):
         if matrix_out:
             matrix_out += ",\n"
-        matrix_out += ', '.join(["{ 0x%02x, 0x%02x }" % (a, t) for a, t in matrix[part: part + 8]])
+        matrix_out += ', '.join(["0x%02x" % b for b in matrix[part: part + 8]])
 
     # header
     print("""
@@ -236,7 +236,7 @@ def main():
     if args.matrix:
         if args.limit:
             print("/* limited to %d chars */" % args.limit)
-        print("struct sp1_tp %s_tp[%s] = {\n%s\n};\n" % (args.id, len(matrix), matrix_out,))
+        print("uchar %s_tp[] = {\n%s\n};\n" % (args.id, matrix_out,))
 
     print("""\
 #define %s_BASE %d

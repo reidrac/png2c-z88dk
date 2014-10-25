@@ -123,6 +123,8 @@ def main():
     tiles = {}
     print_str = []
     matrix = []
+    matrix_tbl_index = {}
+    matrix_tbl = []
     cur_attr = None
     count = 0
     for y in range(0, h, 8):
@@ -167,7 +169,11 @@ def main():
             if not args.limit or count < args.limit:
                 print_str.append(tiles[byte_i] + args.base)
                 paper, ink = attr
-                matrix.extend([C2I[ink] | C2P[paper], tiles[byte_i] + args.base])
+                matrix_i = (C2I[ink] | C2P[paper], tiles[byte_i] + args.base)
+                if matrix_i not in matrix_tbl_index:
+                    matrix_tbl_index[matrix_i] = len(matrix_tbl_index)
+                    matrix_tbl.append("{ 0x%02x, 0x%02x }" % matrix_i)
+                matrix.append(matrix_tbl_index[matrix_i])
 
             count += 1
         if not args.limit or count < args.limit:
@@ -217,6 +223,12 @@ def main():
             matrix_out += ",\n"
         matrix_out += ', '.join(["0x%02x" % b for b in matrix[part: part + 8]])
 
+    matrix_tbl_out = ""
+    for part in range(0, len(matrix_tbl), 8):
+        if matrix_tbl_out:
+            matrix_tbl_out += ",\n"
+        matrix_tbl_out += ', '.join([p for p in matrix_tbl[part: part + 8]])
+
     # header
     print("""
 /* png2c.py %s
@@ -236,7 +248,8 @@ def main():
     if args.matrix:
         if args.limit:
             print("/* limited to %d chars */" % args.limit)
-        print("uchar %s_tp[] = {\n%s\n};\n" % (args.id, matrix_out,))
+        print("struct sp1_tp %s_tbl[] = {\n%s\n};\n" % (args.id, matrix_tbl_out,))
+        print("uchar %s_m[] = {\n%s\n};\n" % (args.id, matrix_out,))
 
     print("""\
 #define %s_BASE %d

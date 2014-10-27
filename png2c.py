@@ -71,6 +71,8 @@ def main():
                         help="don't include the print string")
     parser.add_argument("--matrix", dest="matrix", action="store_true",
                         help="output a tile/attribute matrix")
+    parser.add_argument("--binary", dest="bin_mat", action="store_true",
+                        help="output the matrix in a bin file")
     parser.add_argument("-l", "--limit", dest="limit", default=0, type=int,
                         help="limit the print string to n chars (default: no limit)")
     parser.add_argument("--preferred-bg", dest="color", type=str, default=None,
@@ -88,6 +90,9 @@ def main():
 
     if not args.image:
         parser.error("required parameter: image")
+
+    if args.bin_mat and not args.matrix:
+        parser.error("--binary parameter requires --matrix")
 
     bg_color = None
     if args.color:
@@ -249,7 +254,13 @@ def main():
         if args.limit:
             print("/* limited to %d chars */" % args.limit)
         print("struct sp1_tp %s_tbl[] = {\n%s\n};\n" % (args.id, matrix_tbl_out,))
-        print("uchar %s_m[] = {\n%s\n};\n" % (args.id, matrix_out,))
+        print("/* %d bytes */" % len(matrix))
+        if not args.bin_mat:
+            print("uchar %s_m[] = {\n%s\n};\n" % (args.id, matrix_out,))
+        else:
+            print("/* matrix in %s.bin */" % args.id)
+            with open("%s.bin" % args.id, "w") as fd:
+                fd.write(bytearray(matrix))
 
     print("""\
 #define %s_BASE %d

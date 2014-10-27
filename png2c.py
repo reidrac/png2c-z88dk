@@ -258,7 +258,7 @@ def main():
         if not args.bin_mat:
             print("uchar %s_m[] = {\n%s\n};\n" % (args.id, matrix_out,))
         else:
-            print("/* matrix in %s.bin */" % args.id)
+            print("/* matrix in %s.bin */\n" % args.id)
             with open("%s.bin" % args.id, "w") as fd:
                 fd.write(bytearray(matrix))
 

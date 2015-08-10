@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 png2c.py
-Copyright (C) 2014 by Juan J. Martinez - usebox.net
+Copyright (C) 2015 by Juan J. Martinez - usebox.net
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

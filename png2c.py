@@ -165,6 +165,10 @@ def main():
                 out += ', '.join(["0x%02x" % b for b in byte])
                 prev = (y / 8, x / 8, tiles[byte_i] + args.base)
 
+            # use ink white when there's not colour in the tile
+            if attr[0] == attr[1] and attr[0] == COLORS[0]:
+                attr[1] = COLORS[-1]
+
             if cur_attr != attr:
                 paper, ink = attr
                 if not args.limit or count < args.limit:
